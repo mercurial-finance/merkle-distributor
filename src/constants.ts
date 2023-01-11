@@ -5,7 +5,7 @@ import type { MerkleDistributorTypes } from ".";
 import { MerkleDistributorJSON } from "./idls/merkle_distributor";
 
 export const PROGRAM_ID = new PublicKey(
-  "MRKGLMizK9XSTaD1d1jbVkdHZbQVCSnPpYiTw9aKQv8"
+  "MRKgRBL5XCCT5rwUGnim4yioq9wR4c6rj2EZkw8KdyZ"
 );
 
 export const MERKLE_DISTRIBUTOR_PROGRAM_ID = PROGRAM_ID;

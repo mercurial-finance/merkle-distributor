@@ -47,6 +47,7 @@ describe("merkle-distributor", () => {
     expect(data.numNodesClaimed.toString()).to.equal(ZERO.toString());
     expect(data.root).to.deep.equal(Array.from(new Uint8Array(ZERO_BYTES32)));
     expect(data.totalAmountClaimed.toString()).to.equal(ZERO.toString());
+    expect(data.admin).to.eqAddress(provider.wallet.publicKey);
 
     const tokenAccountInfo = await getTokenAccount(
       provider,
@@ -69,6 +70,12 @@ describe("merkle-distributor", () => {
       const distributorW = await sdk.loadDistributor(distributor);
 
       const claimantKP = Keypair.generate();
+      let sig = await provider.connection.requestAirdrop(
+        claimantKP.publicKey,
+        LAMPORTS_PER_SOL
+      );
+      await provider.connection.confirmTransaction(sig);
+
       const tx = await distributorW.claim({
         index: new u64(0),
         amount: new u64(10_000_000),
@@ -83,6 +90,62 @@ describe("merkle-distributor", () => {
         const err = e as Error;
         expect(err.message).to.include(
           `0x${MerkleDistributorErrors.InvalidProof.code.toString(16)}`
+        );
+      }
+    });
+
+    it("success on admin claim", async () => {
+      const kp = Keypair.generate();
+      const claimAmount = new u64(100);
+      const tree = new BalanceTree([
+        { account: kp.publicKey, amount: claimAmount },
+      ]);
+      const { distributor } = await createAndSeedDistributor(
+        sdk,
+        MAX_TOTAL_CLAIM,
+        MAX_NUM_NODES,
+        tree.getRoot()
+      );
+
+      const distributorW = await sdk.loadDistributor(distributor);
+
+      const tx = await distributorW.claimByAdmin({
+        index: new u64(0),
+        amount: claimAmount,
+        proof: tree.getProof(0, kp.publicKey, claimAmount),
+        claimant: kp.publicKey,
+      });
+      await expectTX(tx, "claim tokens").to.be.fulfilled;
+    });
+
+    it("failed on other user claim", async () => {
+      const kp = Keypair.generate();
+      const claimAmount = new u64(100);
+      const tree = new BalanceTree([
+        { account: kp.publicKey, amount: claimAmount },
+      ]);
+      const { distributor } = await createAndSeedDistributor(
+        sdk,
+        MAX_TOTAL_CLAIM,
+        MAX_NUM_NODES,
+        tree.getRoot()
+      );
+
+      const distributorW = await sdk.loadDistributor(distributor);
+
+      const tx = await distributorW.claimByAWallet({
+        index: new u64(0),
+        amount: claimAmount,
+        proof: tree.getProof(0, kp.publicKey, claimAmount),
+        claimant: kp.publicKey,
+      });
+
+      try {
+        await tx.confirm();
+      } catch (e) {
+        const err = e as Error;
+        expect(err.message).to.include(
+          `0x${MerkleDistributorErrors.PayerMismatch.code.toString(16)}`
         );
       }
     });
@@ -167,6 +230,7 @@ describe("merkle-distributor", () => {
         expectedTotalClaimed.toString()
       );
     });
+
 
     it("cannot allow two claims", async () => {
       const userKP = await createKeypairWithSOL(provider);

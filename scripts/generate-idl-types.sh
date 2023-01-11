@@ -11,9 +11,9 @@ generate_declaration_file() {
     prog="$(basename $PROGRAM_SO .json)"
     OUT_PATH="$OUT_DIR/$prog.ts"
     if [ ! $(which gsed) ]; then
-        PREFIX=$(echo $prog | sed -E 's/(^|_)([a-z])/\U\2/g')
+        PREFIX=$(echo $prog | sed -r 's/(^|_)([a-z])/\U\2/g')
     else
-        PREFIX=$(echo $prog | gsed -E 's/(^|_)([a-z])/\U\2/g')
+        PREFIX=$(echo $prog | gsed -r 's/(^|_)([a-z])/\U\2/g')
     fi
     typename="${PREFIX}IDL"
     rawName="${PREFIX}JSON"
