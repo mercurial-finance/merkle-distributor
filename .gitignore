@@ -133,3 +133,8 @@ dist
 artifacts/
 src/idls/
 data/distributor-info.json
+
+
+admin.json
+
+deployment

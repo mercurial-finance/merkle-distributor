@@ -6,7 +6,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from "@saberhq/token-utils";
 import type { PublicKey, TransactionInstruction } from "@solana/web3.js";
-import { Keypair, SystemProgram } from "@solana/web3.js";
+import { Keypair, SystemProgram, LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 import { findClaimStatusKey, findDistributorKey } from "./pda";
 import type { MerkleDistributorSDK } from "./sdk";
@@ -129,12 +129,53 @@ export class MerkleDistributorWrapper {
   async claim(args: ClaimArgs): Promise<TransactionEnvelope> {
     const { provider } = this.sdk;
     const tx = new TransactionEnvelope(provider, [
+      await this.claimIX(args, args.claimant),
+    ]);
+    const { instruction } = await getOrCreateATA({
+      provider,
+      mint: this.data.mint,
+      owner: args.claimant,
+    });
+    if (instruction) {
+      tx.instructions.unshift(instruction);
+    }
+    return tx;
+  }
+
+  async claimByAdmin(args: ClaimArgs): Promise<TransactionEnvelope> {
+    const { provider } = this.sdk;
+    const tx = new TransactionEnvelope(provider, [
       await this.claimIX(args, provider.wallet.publicKey),
     ]);
     const { instruction } = await getOrCreateATA({
       provider,
       mint: this.data.mint,
       owner: args.claimant,
+      payer: provider.wallet.publicKey
+    });
+    if (instruction) {
+      tx.instructions.unshift(instruction);
+    }
+    return tx;
+  }
+
+  async claimByAWallet(args: ClaimArgs): Promise<TransactionEnvelope> {
+    const { provider } = this.sdk;
+    const payer = Keypair.generate();
+    let sig = await provider.connection.requestAirdrop(
+      payer.publicKey,
+      LAMPORTS_PER_SOL
+    );
+    await provider.connection.confirmTransaction(sig);
+    const tx = new TransactionEnvelope(provider, [
+      await this.claimIX(args, payer.publicKey),
+    ]);
+    tx.addSigners(payer);
+    const { instruction } = await getOrCreateATA({
+      provider,
+      mint: this.data.mint,
+      owner: args.claimant,
+      payer: payer.publicKey,
     });
     if (instruction) {
       tx.instructions.unshift(instruction);

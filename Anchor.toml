@@ -12,16 +12,16 @@ cluster = "localnet"
 wallet = "./tests/test-key.json"
 
 [programs.mainnet]
-merkle_distributor = "MRKGLMizK9XSTaD1d1jbVkdHZbQVCSnPpYiTw9aKQv8"
+merkle_distributor = "MRKgRBL5XCCT5rwUGnim4yioq9wR4c6rj2EZkw8KdyZ"
 
 [programs.devnet]
-merkle_distributor = "MRKGLMizK9XSTaD1d1jbVkdHZbQVCSnPpYiTw9aKQv8"
+merkle_distributor = "MRKgRBL5XCCT5rwUGnim4yioq9wR4c6rj2EZkw8KdyZ"
 
 [programs.testnet]
-merkle_distributor = "MRKGLMizK9XSTaD1d1jbVkdHZbQVCSnPpYiTw9aKQv8"
+merkle_distributor = "MRKgRBL5XCCT5rwUGnim4yioq9wR4c6rj2EZkw8KdyZ"
 
 [programs.localnet]
-merkle_distributor = "MRKGLMizK9XSTaD1d1jbVkdHZbQVCSnPpYiTw9aKQv8"
+merkle_distributor = "MRKgRBL5XCCT5rwUGnim4yioq9wR4c6rj2EZkw8KdyZ"
 
 [scripts]
 test = "yarn mocha"

@@ -3,8 +3,10 @@
   "compilerOptions": {
     "module": "CommonJS",
     "noEmit": true,
-    "types": ["mocha"],
-    "resolveJsonModule": true
+    "types": ["mocha", "node"],
+    "resolveJsonModule": true,
+    "noUnusedLocals": false,    
+    "noUnusedParameters": false,
   },
   "include": ["./src", "./tests", "scripts/", ".eslintrc.cjs", ".mocharc.cjs"]
 }

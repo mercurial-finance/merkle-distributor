@@ -20,7 +20,7 @@ use vipers::prelude::*;
 
 pub mod merkle_proof;
 
-declare_id!("MRKGLMizK9XSTaD1d1jbVkdHZbQVCSnPpYiTw9aKQv8");
+declare_id!("MRKgRBL5XCCT5rwUGnim4yioq9wR4c6rj2EZkw8KdyZ");
 
 /// The [merkle_distributor] program.
 #[program]
@@ -49,6 +49,8 @@ pub mod merkle_distributor {
         distributor.total_amount_claimed = 0;
         distributor.num_nodes_claimed = 0;
 
+        distributor.admin = ctx.accounts.payer.key();
+
         Ok(())
     }
 
@@ -68,11 +70,9 @@ pub mod merkle_distributor {
             !claim_status.is_claimed && claim_status.claimed_at == 0,
             DropAlreadyClaimed
         );
-
         let claimant_account = &ctx.accounts.claimant;
         let distributor = &ctx.accounts.distributor;
-        invariant!(claimant_account.is_signer, Unauthorized);
-
+        // invariant!(claimant_account.is_signer, Unauthorized);
         // Verify the merkle proof.
         let node = anchor_lang::solana_program::keccak::hashv(&[
             &index.to_le_bytes(),
@@ -83,7 +83,6 @@ pub mod merkle_distributor {
             merkle_proof::verify(proof, distributor.root, node.0),
             InvalidProof
         );
-
         // Mark it claimed and send the tokens.
         claim_status.amount = amount;
         claim_status.is_claimed = true;
@@ -204,12 +203,12 @@ pub struct Claim<'info> {
     #[account(mut)]
     pub to: Account<'info, TokenAccount>,
 
-    /// Who is claiming the tokens.
+    /// CHECK: Who is claiming the tokens.
     #[account(address = to.owner @ ErrorCode::OwnerMismatch)]
-    pub claimant: Signer<'info>,
+    pub claimant: UncheckedAccount<'info>,
 
-    /// Payer of the claim.
-    #[account(mut)]
+    /// Payer of the claim, must be claimant or admin
+    #[account(mut, constraint = payer.key() == claimant.key() || payer.key() == distributor.admin @ ErrorCode::PayerMismatch)]
     pub payer: Signer<'info>,
 
     /// The [System] program.
@@ -241,10 +240,12 @@ pub struct MerkleDistributor {
     pub total_amount_claimed: u64,
     /// Number of nodes that have been claimed.
     pub num_nodes_claimed: u64,
+
+    pub admin : Pubkey,
 }
 
 impl MerkleDistributor {
-    pub const LEN: usize = PUBKEY_BYTES + 1 + 32 + PUBKEY_BYTES + 8 * 4;
+    pub const LEN: usize = PUBKEY_BYTES + 1 + 32 + PUBKEY_BYTES + 8 * 4 + PUBKEY_BYTES;
 }
 
 /// Holds whether or not a claimant has claimed tokens.
@@ -293,4 +294,6 @@ pub enum ErrorCode {
     Unauthorized,
     #[msg("Token account owner did not match intended owner")]
     OwnerMismatch,
+    #[msg("Payer did not match intended payer")]
+    PayerMismatch,
 }
