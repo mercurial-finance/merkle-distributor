@@ -28,7 +28,7 @@ import { shortenAddress } from "../utils/address";
 
 const PROGRAM_ID = new PublicKey("MRKgRBL5XCCT5rwUGnim4yioq9wR4c6rj2EZkw8KdyZ");
 const DISTRIBUTOR_ACCOUNT = new PublicKey(
-  "7dY6VFakv3Xtib15UZP75YFFkKD5uYBE2Egzof8nn82r"
+  "ERWtH9Li91wJxebsb4erqRA3NSi1VkjovZx1qVznYJsG"
 );
 
 export default function Home() {
