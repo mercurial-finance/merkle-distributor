@@ -148,7 +148,9 @@ export default function Home() {
         mint: distributorState.mint,
         owner: claimant,
       });
-      const preInstructions = [createOwnerDistributorATAIx!];
+      const preInstructions = createOwnerDistributorATAIx
+        ? [createOwnerDistributorATAIx]
+        : [];
       const accounts = {
         distributor: DISTRIBUTOR_ACCOUNT,
         claimStatus,
