@@ -28,7 +28,7 @@ import { shortenAddress } from "../utils/address";
 
 const PROGRAM_ID = new PublicKey("MRKgRBL5XCCT5rwUGnim4yioq9wR4c6rj2EZkw8KdyZ");
 const DISTRIBUTOR_ACCOUNT = new PublicKey(
-  "ERWtH9Li91wJxebsb4erqRA3NSi1VkjovZx1qVznYJsG"
+  "B31cVGxazXGxHnXBBi9o19vmUrmiDsJmByC6NjNR24XP"
 );
 
 export default function Home() {
@@ -81,10 +81,6 @@ export default function Home() {
     refetch: refetchClaimedAmount,
     isLoading: isLoadingClaimedAmount,
   } = useQuery([snapShotIndex, walletContext.connected], async () => {
-    console.log(
-      "🚀 ~ file: index.tsx:84 ~ Home ~ snapShotIndex",
-      snapShotIndex
-    );
     if (
       typeof snapShotIndex === "undefined" ||
       snapShotIndex < 0 ||
