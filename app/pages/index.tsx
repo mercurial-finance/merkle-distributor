@@ -81,7 +81,15 @@ export default function Home() {
     refetch: refetchClaimedAmount,
     isLoading: isLoadingClaimedAmount,
   } = useQuery([snapShotIndex, walletContext.connected], async () => {
-    if (typeof snapShotIndex === "undefined" || !walletContext.connected)
+    console.log(
+      "🚀 ~ file: index.tsx:84 ~ Home ~ snapShotIndex",
+      snapShotIndex
+    );
+    if (
+      typeof snapShotIndex === "undefined" ||
+      snapShotIndex < 0 ||
+      !walletContext.connected
+    )
       return 0;
 
     const [claimPda] = await findClaimStatusKey(
