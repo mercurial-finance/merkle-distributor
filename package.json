@@ -39,6 +39,7 @@
     "@saberhq/solana-contrib": "^1.13.28",
     "@saberhq/token-utils": "^1.13.28",
     "@saberhq/tsconfig": "^1.13.28",
+    "@solana/spl-token": "^0.1.8",
     "@solana/web3.js": "^1.44.0",
     "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.3.1",
@@ -72,7 +73,10 @@
     "idl:generate": "./scripts/idl.sh && ./scripts/generate-idl-types.sh",
     "idl:generate:nolint": "./scripts/idl.sh && RUN_ESLINT=none ./scripts/generate-idl-types.sh",
     "cli:init": "CLUSTER=devnet yarn mocha cli/initialize.ts",
-    "cli:claim": "CLUSTER=devnet yarn mocha cli/claim.ts"
+    "cli:claim": "CLUSTER=devnet yarn mocha cli/claim.ts",
+    "cli:create_token": "CLUSTER=devnet yarn mocha cli/create_new_token.ts",
+    "cli:transfer_token_authority": "CLUSTER=devnet yarn mocha cli/transfer_token_authority.ts",
+    "cli:init_with_mint": "CLUSTER=devnet yarn mocha cli/initialize_with_existing_mint.ts"
   },
   "dependencies": {
     "js-sha3": "^0.8.0",
