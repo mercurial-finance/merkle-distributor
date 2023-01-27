@@ -7,7 +7,7 @@ import { chaiSolana, expectTX } from "@saberhq/chai-solana";
 import chai, { expect } from "chai";
 chai.use(chaiSolana);
 
-const distributor = new PublicKey("FGgNBDCkgJbzLicpm5fTKeAjEMQ2FSDMjhjpvsSW8bEX");
+const distributor = new PublicKey("EgN7JjfZamr3Zmdy9tP8eLxzgX6dkibrLLAJrNGRupJc");
 
 var claim = async () => {
   const { provider } = setupEnv();
@@ -15,7 +15,7 @@ var claim = async () => {
   const { tree } = buildTree();
   try {
     const distributorW = await sdk.loadDistributor(distributor);
-    let userIndex = 1;
+    let userIndex = 0;
     let user = Object(snapshot[userIndex]);
     const tx = await distributorW.claimByAdmin({
       index: new u64(userIndex),
@@ -23,7 +23,8 @@ var claim = async () => {
       proof: tree.getProof(userIndex, new PublicKey(user.authority), new u64(user.amount)),
       claimant: new PublicKey(user.authority),
     });
-    await tx.confirm();
+    const pendingTx = await tx.confirm();
+    console.log("signature: ", pendingTx.signature)
   } catch (e) {
     console.log(e)
   }

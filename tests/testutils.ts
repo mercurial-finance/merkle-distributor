@@ -79,3 +79,31 @@ export const createAndSeedDistributor = async (
     pendingDistributor,
   };
 };
+
+
+export const createDistributorWithExistingMint = async (
+  sdk: MerkleDistributorSDK,
+  maxTotalClaim: u64,
+  maxNumNodes: u64,
+  root: Buffer,
+  mint: PublicKey,
+): Promise<{
+  distributor: PublicKey;
+  pendingDistributor: PendingDistributor;
+}> => {
+  const { provider } = sdk;
+
+  const pendingDistributor = await sdk.createDistributor({
+    root,
+    maxTotalClaim,
+    maxNumNodes,
+    tokenMint: mint,
+  });
+  await expectTX(pendingDistributor.tx, "create merkle distributor").to.be
+    .fulfilled;
+
+  return {
+    distributor: pendingDistributor.distributor,
+    pendingDistributor,
+  };
+};
